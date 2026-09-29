@@ -1,37 +1,34 @@
-const jsonfile = require("jsonfile");
-const moment = require("moment");
-const simpleGit = require("simple-git");
+const { execFileSync, spawnSync } = require("node:child_process");
+const { writeFileSync } = require("node:fs");
+const path = require("node:path");
 
-const FILE_PATH = "./data.json";
+const date = process.argv[2];
+const validFormat = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[+-]\d{2}:\d{2}$/;
 
-// const DATE = moment().format();
-const DATE = moment().subtract(3, "d").format();
-console.log(DATE);
-const data = {
-  date: DATE,
-};
+if (!date || !validFormat.test(date) || Number.isNaN(Date.parse(date)) || Date.parse(date) > Date.now()) {
+  console.error("Usage: node index.js YYYY-MM-DDTHH:mm:ss+05:30 (a past date with a time-zone offset)");
+  process.exit(1);
+}
 
-jsonfile.writeFile(FILE_PATH, data, () => {
-  simpleGit().add([FILE_PATH]).commit(DATE, { "--date": DATE }).push();
+const repo = __dirname;
+const file = path.join(repo, "data.json");
+
+writeFileSync(file, `${JSON.stringify({ date })}\n`);
+execFileSync("git", ["add", "--", "data.json"], { cwd: repo, stdio: "inherit" });
+
+const diff = spawnSync("git", ["diff", "--cached", "--quiet", "--", "data.json"], { cwd: repo });
+if (diff.status === 0) {
+  console.error("data.json already has this value; there is no new change to commit.");
+  process.exit(1);
+}
+if (diff.status !== 1) {
+  throw diff.error || new Error("Could not check the staged change to data.json.");
+}
+
+execFileSync("git", ["commit", "-m", `Record ${date}`, "--only", "--", "data.json"], {
+  cwd: repo,
+  stdio: "inherit",
+  env: { ...process.env, GIT_AUTHOR_DATE: date, GIT_COMMITTER_DATE: date },
 });
 
-// const makeCommit = (x, y) => {
-//   //   const DATE = moment()
-//   //     .subtract(1, "y")
-//   //     .add(1, "d")
-//   //     .add(x, "w")
-//   //     .add(y, "d")
-//   //     .format();
-//   // const DATE = moment().subtract(3, "d").format();
-//   const DATE = moment().format();
-//   console.log(DATE);
-//   const data = {
-//     date: DATE,
-//   };
-
-//   jsonfile.writeFile(FILE_PATH, data, () => {
-//     simpleGit().add([FILE_PATH]).commit(DATE, { "--date": DATE }).push();
-//   });
-// };
-
-// makeCommit(3, 3);
+console.log("Commit created. Run `git push origin master` to send it to GitHub.");
