@@ -1,0 +1,25 @@
+{
+  "name": "githu-bot",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/nirajdewangan/githu-bot#readme",
+  "bugs": {
+    "url": "https://github.com/nirajdewangan/githu-bot/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nirajdewangan/githu-bot.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "jsonfile": "^6.2.1",
+    "moment": "^2.30.1",
+    "simple-git": "^3.36.0"
+  }
+}
