@@ -1,23 +1,25 @@
 # git-testing
 
-A small Git date experiment. The script runs with Node.js and Git without installing npm packages.
+This repository experiments with dated Git commits.
 
-## Create a dated test commit
+## Run
 
-Run this from your clone on the `master` branch, using an explicit time-zone offset:
+From a clone on the `master` branch:
 
 ```bash
+npm ci
 git config --get user.email
-node index.js 2026-09-27T12:00:00+05:30
-git push origin master
+node index.js
 ```
 
-Use an email address connected to your GitHub account. The script changes only `data.json`, makes one commit, and prints an error if the file already has the requested value. It does not push automatically. Give it a date and time in the past, with an offset appropriate for your location.
+The script writes `data.json`, creates a commit with an author date three days before your computer's current local time, and pushes to the configured upstream branch. Make sure `master` tracks `origin/master` and your Git email is connected to your GitHub account.
 
-## Check the contribution calendar
+To choose a different number of days, edit `moment().subtract(3, "d")` in `index.js`.
+
+## Check the dates
 
 ```bash
 git log -5 --pretty=fuller --date=iso-strict
 ```
 
-The **AuthorDate** determines the day on your GitHub profile; the **CommitDate** determines the date shown in the repository history. The script sets both to the requested date. A commit must also use an email linked to your GitHub account and reach the repository's default branch (`master` here). GitHub says the contribution calendar can take up to 24 hours to refresh after a qualifying commit.
+`git commit --date` sets the author date; the committer date stays at the time you run the script. GitHub uses the author date for your profile calendar and the committer date in repository history. Commits must reach the default branch (`master` here), and qualifying contributions can take up to 24 hours to appear on the graph.
