@@ -1,6 +1,6 @@
 # git-testing
 
-A small Git date experiment. The script requires Node.js and Git; it has no npm dependencies.
+A small Git date experiment. The script runs with Node.js and Git without installing npm packages.
 
 ## Create a dated test commit
 
